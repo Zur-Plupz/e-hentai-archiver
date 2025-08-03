@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -13,6 +15,18 @@ from collections import namedtuple
 
 Torrent = namedtuple('Torrent', ['title', 'size', 'seeds', 'peers', 'downloads', 'uploader', 'redist_url', 'fpath'])
 
+
+def try_to_find_element (driver: webdriver.Remote, by, value, timeout:int=0):
+    try:
+        if timeout >0:
+            return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
+        else:
+            return driver.find_element(by, value)
+
+    except (NoSuchElementException, TimeoutException):
+        print(f'Element not found: {by} {value}')
+
+        return None
 
 
 class SeleniumScraper:
@@ -66,16 +80,18 @@ class SeleniumScraper:
 
         wait = WebDriverWait(self.driver, timeout)
 
-        # #torrentinfo > div > form:nth-child(3)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#torrentinfo')))
 
-        if not include_outdated:
-            # form is before => #torrentinfo > div:nth-child(1) > p if contains "Outdated Torrents:"
-            outdated_torrents_element = self.driver.find_element(By.CSS_SELECTOR, '#torrentinfo > div:nth-child(1) > p')
+        outdated_torrents_element = None
 
+        if not include_outdated:
+            outdated_torrents_element = try_to_find_element(self.driver, 
+                                                            By.CSS_SELECTOR, 
+                                                            '#torrentinfo > div:nth-child(1) > p')
+
+        if outdated_torrents_element:
             torrent_forms = outdated_torrents_element.find_elements(By.XPATH, './preceding-sibling::form')
         else:
-            # foreach #torrentinfo > div > form:nth-child(3)
             torrent_forms = self.driver.find_elements(By.CSS_SELECTOR, '#torrentinfo > div > form')
 
         torrentlist :list[Torrent] = []
