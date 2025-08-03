@@ -53,3 +53,4 @@ docs/_build/
 /logs
 *.venv*
 *.vscode*
+*.torrent
