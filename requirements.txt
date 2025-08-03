@@ -1,0 +1,5 @@
+pydantic
+fastapi
+uvicorn
+selenium==4.34.2
+loguru==0.7.3
