@@ -8,9 +8,12 @@ class Torrent(BaseModel):
     name: str
     size: str
     id: Optional[int] = None
+    redist_url: Optional[str] = None
+    custom_url: Optional[str] = None
+    torrent_path: Optional[str] = None
     seeds: Optional[int] = None
     peers: Optional[int] = None
-    completed: int = 0
+    completed: bool = False
     downloads: int = 0
     posted_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
