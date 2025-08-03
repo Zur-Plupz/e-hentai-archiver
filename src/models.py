@@ -8,6 +8,7 @@ class Torrent(BaseModel):
     name: str
     size: str
     id: Optional[int] = None
+    uploader: Optional[str] = None
     redist_url: Optional[str] = None
     custom_url: Optional[str] = None
     torrent_path: Optional[str] = None

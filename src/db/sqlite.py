@@ -347,3 +347,46 @@ def add_gallery(conn: sqlite3.Connection, gl: Gallery) -> None:
 
     tag.id = new_tag.id
     tag.created_at = new_tag.created_at
+
+
+def add_gallery_torrent(conn: sqlite3.Connection, torrent: Torrent) -> None:
+  now = datetime.now()
+
+  sql = """
+  INSERT INTO torrents (
+    gallery_id,
+    hash,
+    name,
+    size,
+    seeds,
+    peers,
+    downloads,
+    uploader,
+    redist_url,
+    torrent_path,
+    created_at
+  ) VALUES (%s)
+  """
+
+  bindings = (
+    torrent.gallery_id,
+    torrent.hash,
+    torrent.name,
+    torrent.size,
+    torrent.seeds,
+    torrent.peers,
+    torrent.downloads,
+    torrent.uploader,
+    torrent.redist_url,
+    torrent.torrent_path,
+    now.isoformat()
+  )
+
+  cursor = conn.cursor()
+
+  cursor.execute(sql, bindings) # type: ignore
+
+  _id = cursor.lastrowid # type: ignore
+
+  torrent.id = _id
+  torrent.created_at = now
